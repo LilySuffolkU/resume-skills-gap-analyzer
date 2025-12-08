@@ -1,0 +1,177 @@
+{
+  "Software Engineer": {
+    "required": [
+      "Python",
+      "Java",
+      "JavaScript",
+      "Git",
+      "SQL",
+      "REST API"
+    ],
+    "preferred": [
+      "React",
+      "Docker",
+      "AWS",
+      "Microservices",
+      "Agile"
+    ],
+    "bonus": [
+      "Kubernetes",
+      "Machine Learning",
+      "GraphQL"
+    ]
+  },
+  "Data Scientist": {
+    "required": [
+      "Python",
+      "SQL",
+      "Machine Learning",
+      "Data Analysis",
+      "Pandas",
+      "NumPy"
+    ],
+    "preferred": [
+      "TensorFlow",
+      "PyTorch",
+      "Apache Spark",
+      "Tableau",
+      "Jupyter"
+    ],
+    "bonus": [
+      "Deep Learning",
+      "Natural Language Processing",
+      "Computer Vision"
+    ]
+  },
+  "Full Stack Developer": {
+    "required": [
+      "JavaScript",
+      "React",
+      "Node.js",
+      "SQL",
+      "Git",
+      "REST API"
+    ],
+    "preferred": [
+      "TypeScript",
+      "Docker",
+      "AWS",
+      "MongoDB",
+      "Express.js"
+    ],
+    "bonus": [
+      "GraphQL",
+      "Kubernetes",
+      "Microservices"
+    ]
+  },
+  "DevOps Engineer": {
+    "required": [
+      "Docker",
+      "Kubernetes",
+      "AWS",
+      "Git",
+      "CI/CD",
+      "Linux"
+    ],
+    "preferred": [
+      "Terraform",
+      "Ansible",
+      "Jenkins",
+      "Prometheus",
+      "Grafana"
+    ],
+    "bonus": [
+      "ELK Stack",
+      "Splunk",
+      "Helm"
+    ]
+  },
+  "Backend Developer": {
+    "required": [
+      "Python",
+      "Java",
+      "SQL",
+      "REST API",
+      "Git",
+      "Microservices"
+    ],
+    "preferred": [
+      "Docker",
+      "AWS",
+      "MongoDB",
+      "Redis",
+      "Kafka"
+    ],
+    "bonus": [
+      "Kubernetes",
+      "GraphQL",
+      "gRPC"
+    ]
+  },
+  "Frontend Developer": {
+    "required": [
+      "JavaScript",
+      "React",
+      "HTML",
+      "CSS",
+      "Git"
+    ],
+    "preferred": [
+      "TypeScript",
+      "Angular",
+      "Vue.js",
+      "Webpack",
+      "Bootstrap"
+    ],
+    "bonus": [
+      "Next.js",
+      "GraphQL",
+      "SASS"
+    ]
+  },
+  "Cloud Architect": {
+    "required": [
+      "AWS",
+      "Cloud Architecture",
+      "Docker",
+      "Kubernetes",
+      "Terraform"
+    ],
+    "preferred": [
+      "Azure",
+      "Google Cloud Platform",
+      "CI/CD",
+      "Microservices",
+      "System Design"
+    ],
+    "bonus": [
+      "Serverless",
+      "Multi-cloud",
+      "Security"
+    ]
+  },
+  "Machine Learning Engineer": {
+    "required": [
+      "Python",
+      "Machine Learning",
+      "TensorFlow",
+      "PyTorch",
+      "SQL",
+      "Pandas"
+    ],
+    "preferred": [
+      "Deep Learning",
+      "AWS",
+      "Docker",
+      "Apache Spark",
+      "MLOps"
+    ],
+    "bonus": [
+      "Natural Language Processing",
+      "Computer Vision",
+      "Kubernetes"
+    ]
+  }
+}
+
