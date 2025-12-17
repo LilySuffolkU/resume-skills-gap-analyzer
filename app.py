@@ -85,10 +85,9 @@ def load_data():
     try:
         skill_dict = load_skill_dictionary("data/skill_dictionary.json")
         job_templates = load_job_role_templates("data/job_role_templates.json")
-        return skill_dict, job_templates
+        return skill_dict, job_templates, None  # Return error as None if successful
     except Exception as e:
-        st.error(f"Error loading data files: {str(e)}")
-        return None, None
+        return None, None, str(e)  # Return error message instead of calling st.error()
 
 
 def main():
@@ -99,7 +98,11 @@ def main():
     st.markdown('<div class="sub-header">Upload resume → Paste job description → Identify skill gaps</div>', unsafe_allow_html=True)
     
     # Load data
-    skill_dict, job_templates = load_data()
+    skill_dict, job_templates, error = load_data()
+    if error:
+        st.error(f"Error loading data files: {error}")
+        st.info("Please ensure data/skill_dictionary.json and data/job_role_templates.json exist.")
+        return
     if skill_dict is None or job_templates is None:
         st.error("Failed to load required data files. Please ensure data/skill_dictionary.json and data/job_role_templates.json exist.")
         return
