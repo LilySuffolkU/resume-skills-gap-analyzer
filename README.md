@@ -8,8 +8,6 @@ A comprehensive Streamlit application that analyzes resumes against job descript
 
 **📹 Video Demonstration:** [Your Video Link Here](https://youtube.com/watch?v=your-video-id)
 
-> **Note:** Replace the links above with your actual Streamlit Cloud deployment URL and video demonstration link.
-
 ## 🎯 Features
 
 ### Diagnostic Analytics
