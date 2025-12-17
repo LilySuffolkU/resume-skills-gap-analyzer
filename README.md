@@ -4,7 +4,7 @@ A comprehensive Streamlit application that analyzes resumes against job descript
 
 ## 🎥 Live Demo & Video
 
-**🌐 Live Application:** [(https://your-app-name.streamlit.app)](https://resume-skills-gap-analyzer-9qsk9dy3kqde6pr3ksrv4s.streamlit.app/)
+**🌐 Live Application:** [(https://Resume Skills Gap Analyzer.streamlit.app)](https://resume-skills-gap-analyzer-9qsk9dy3kqde6pr3ksrv4s.streamlit.app/)
 
 **📹 Video Demonstration:** [Your Video Link Here](https://youtube.com/watch?v=your-video-id)
 
