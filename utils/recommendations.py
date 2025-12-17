@@ -58,6 +58,11 @@ LEARNING_RESOURCES = {
         {'platform': 'Coursera', 'course': 'Data Analysis with Python', 'url': 'https://www.coursera.org/learn/data-analysis-with-python'},
         {'platform': 'Udemy', 'course': 'Data Analysis with Pandas', 'url': 'https://www.udemy.com/course/data-analysis-with-pandas/'},
         {'platform': 'YouTube', 'course': 'Data Analysis Tutorial', 'url': 'https://www.youtube.com/results?search_query=data+analysis+tutorial'}
+    ],
+    'r': [
+        {'platform': 'Coursera', 'course': 'R Programming', 'url': 'https://www.coursera.org/learn/r-programming'},
+        {'platform': 'Udemy', 'course': 'R Programming A-Z', 'url': 'https://www.udemy.com/course/r-programming/'},
+        {'platform': 'YouTube', 'course': 'R Programming Tutorial', 'url': 'https://www.youtube.com/results?search_query=r+programming+tutorial'}
     ]
 }
 
@@ -97,17 +102,28 @@ def find_resource_for_skill(skill: str) -> List[Dict]:
     Returns:
         List of 1-2 learning resources
     """
-    skill_lower = skill.lower()
+    import re
+    skill_lower = skill.lower().strip()
     
-    # Direct match
+    # Step 1: Direct exact match (case-insensitive)
     if skill_lower in LEARNING_RESOURCES:
         resources = LEARNING_RESOURCES[skill_lower]
         return random.sample(resources, min(2, len(resources)))
     
-    # Partial match
+    # Step 2: Partial match - but only if key is a complete word in the skill
+    # This prevents "R" from matching "JavaScript" or "React" (because "r" is just a letter in those words)
     for key, resources in LEARNING_RESOURCES.items():
-        if key in skill_lower or skill_lower in key:
-            return random.sample(resources, min(2, len(resources)))
+        # Only match if key is at least 2 characters and appears as a complete word
+        if len(key) >= 2:
+            # Check if key is a complete word in skill_lower using word boundaries
+            pattern = r'\b' + re.escape(key) + r'\b'
+            if re.search(pattern, skill_lower):
+                return random.sample(resources, min(2, len(resources)))
+            # Also check if skill is a complete word in key (for compound skills like "React Native")
+            if len(skill_lower) >= 2:
+                skill_pattern = r'\b' + re.escape(skill_lower) + r'\b'
+                if re.search(skill_pattern, key):
+                    return random.sample(resources, min(2, len(resources)))
     
     # Default generic resources
     return [
@@ -184,4 +200,3 @@ def generate_recommendations(missing_skills: Dict[str, List[str]]) -> Dict[str, 
             })
     
     return recommendations
-

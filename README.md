@@ -1,9 +1,18 @@
 # Resume Skills Gap Analyzer
 
-A comprehensive Streamlit application that analyzes resumes against job descriptions to identify skill gaps and generate personalized learning recommendations.
+A comprehensive Streamlit application that analyzes resumes against job descriptions to identify skill gaps, generate personalized learning recommendations, and **optimize skill learning plans using prescriptive analytics**.
+
+## 🎥 Live Demo & Video
+
+**🌐 Live Application:** [Your Streamlit App Link Here](https://your-app-name.streamlit.app)
+
+**📹 Video Demonstration:** [Your Video Link Here](https://youtube.com/watch?v=your-video-id)
+
+> **Note:** Replace the links above with your actual Streamlit Cloud deployment URL and video demonstration link.
 
 ## 🎯 Features
 
+### Diagnostic Analytics
 - **Multi-format Resume Support**: Upload resumes in PDF, DOCX, or TXT format
 - **Intelligent Skill Extraction**: Automatically extracts technical skills from resumes and job descriptions using a comprehensive skill dictionary (200+ skills)
 - **Semantic Matching**: Uses SBERT embeddings for intelligent skill matching beyond simple keyword matching
@@ -16,6 +25,16 @@ A comprehensive Streamlit application that analyzes resumes against job descript
   - Learning resources (Coursera, Udemy, YouTube)
   - Resume bullet point suggestions
   - Estimated learning timelines
+
+### Prescriptive Analytics (Optimization)
+- **🎯 Optimal Skill Learning Plan**: Uses **Integer Linear Programming (PuLP)** to find the optimal sequence of skills to learn
+- **Constraint-Based Optimization**: Maximizes job match score improvement under:
+  - ⏱️ **Time constraints** (e.g., "I have 3 months")
+  - 💰 **Budget constraints** (e.g., "I have $500")
+- **Objective Function**: Maximizes weighted score improvement (required skills weighted 1.0, preferred 0.6, bonus 0.3)
+- **Prescriptive Solution**: Answers "Given X months and $Y budget, which skills should I learn to maximize my match score?"
+
+### Additional Features
 - **PDF Export**: Generate comprehensive PDF reports with all analysis results
 - **Job Template Library**: Pre-configured templates for common roles (Software Engineer, Data Scientist, DevOps, etc.)
 
@@ -82,7 +101,12 @@ The application will open in your default web browser at `http://localhost:8501`
    - See skills found in your resume vs. job requirements
    - Identify missing skills by priority
    - Explore learning recommendations
-5. **Export**: Download a comprehensive PDF report
+5. **Optimize Learning Plan** (Prescriptive Analytics):
+   - Set your time budget (e.g., 3 months)
+   - Set your budget constraint (e.g., $500)
+   - Click "🔬 Optimize Learning Plan"
+   - View the optimal skill learning sequence that maximizes your match score improvement
+6. **Export**: Download a comprehensive PDF report
 
 ## 📁 Project Structure
 
@@ -97,6 +121,7 @@ resume_skills_gap_analyzer/
 │     ├── skill_extraction.py   # Skill keyword matching
 │     ├── gap_analysis.py       # SBERT-based gap analysis
 │     ├── recommendations.py   # Learning resource recommendations
+│     ├── optimization.py      # Prescriptive optimization (PuLP/scipy)
 │     └── pdf_export.py         # PDF report generation
 │
 │── data/
@@ -212,11 +237,27 @@ Contributions are welcome! Feel free to:
 
 For issues, questions, or suggestions, please open an issue on the GitHub repository.
 
+## 🔬 Prescriptive Analytics Implementation
+
+This application implements **prescriptive analytics** using optimization techniques:
+
+- **Optimization Library**: [PuLP](https://github.com/coin-or/pulp) (Integer Linear Programming)
+- **Fallback Solver**: [scipy.optimize](https://docs.scipy.org/doc/scipy/reference/optimize.html) (continuous relaxation)
+- **Problem Type**: 0-1 Knapsack variant with multiple constraints
+- **Objective Function**: Maximize weighted job match score improvement
+- **Constraints**: 
+  - Time budget (months)
+  - Cost budget (dollars)
+- **Decision Variables**: Binary (learn skill or not)
+
+The optimization engine answers the prescriptive question: *"Given my constraints, what is the optimal set of skills to learn?"*
+
 ## 🎉 Acknowledgments
 
 - Built with [Streamlit](https://streamlit.io)
 - Uses [sentence-transformers](https://www.sbert.net/) for semantic similarity
 - PDF generation powered by [ReportLab](https://www.reportlab.com/)
+- Optimization powered by [PuLP](https://github.com/coin-or/pulp) and [scipy](https://scipy.org/)
 
 ---
 

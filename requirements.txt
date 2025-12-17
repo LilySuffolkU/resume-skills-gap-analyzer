@@ -7,4 +7,6 @@ pandas
 sentence-transformers
 scikit-learn
 reportlab
+pulp
+scipy
 
