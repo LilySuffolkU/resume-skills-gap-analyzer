@@ -350,9 +350,13 @@ def main():
     st.markdown('<div class="sub-header">Upload resume → Paste job description → Identify skill gaps</div>', unsafe_allow_html=True)
 
     # Load data
-    skill_dict, job_templates = load_data()
+    skill_dict, job_templates, error = load_data()
+    if error:
+        st.error(f"Error loading data files: {error}")
+        st.info("Please ensure data/skill_dictionary.json and data/job_role_templates.json exist.")
+        return
     if skill_dict is None or job_templates is None:
-        st.error("Failed to load required data files. Ensure data/skill_dictionary.json and data/job_role_templates.json exist.")
+        st.error("Failed to load required data files. Please ensure data/skill_dictionary.json and data/job_role_templates.json exist.")
         return
 
     # Sidebar
