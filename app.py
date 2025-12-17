@@ -357,311 +357,8 @@ def display_results(
     
     st.markdown("---")
     
-    # ============================================================================
-    # PRESCRIPTIVE OPTIMIZATION MODEL - PRIMARY COMPONENT
-    # ============================================================================
-    st.markdown("## 🎯 Prescriptive Optimization Model")
-    
-    st.markdown(
-        """
-        <div style="background-color: #fff3cd; padding: 1rem; border-left: 4px solid #ffc107; margin-bottom: 1rem;">
-        <strong>Prescriptive Analytics:</strong> This section uses <strong>Integer Linear Programming (ILP)</strong> 
-        to determine the <strong>optimal decision</strong> of which skills to learn, maximizing your job match score 
-        improvement subject to time and budget constraints.
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    # Mathematical Formulation
-    with st.expander("📐 Optimization Model Formulation", expanded=True):
-        st.markdown("### Decision Variables")
-        st.latex(r"x_i \in \{0, 1\} \quad \forall i \in \text{missing skills}")
-        st.markdown("*Binary variable: $x_i = 1$ if skill $i$ is selected for learning, $x_i = 0$ otherwise*")
-        
-        st.markdown("### Objective Function")
-        st.latex(r"\max \sum_{i} w_i \cdot x_i")
-        st.markdown("*Maximize weighted job match score improvement, where $w_i$ is the score weight for skill $i$*")
-        
-        st.markdown("### Constraints")
-        st.latex(r"\sum_{i} t_i \cdot x_i \leq T")
-        st.markdown("*Total learning time must not exceed time budget $T$ (months)*")
-        
-        st.latex(r"\sum_{i} c_i \cdot x_i \leq C")
-        st.markdown("*Total learning cost must not exceed cost budget $C$ (dollars)*")
-        
-        st.latex(r"x_i \in \{0, 1\} \quad \forall i")
-        st.markdown("*Binary decision variables*")
-        
-        st.markdown("---")
-        st.markdown("**Where:**")
-        st.markdown("- $w_i$ = score weight for skill $i$ (required: 1.0, preferred: 0.6, bonus: 0.3)")
-        st.markdown("- $t_i$ = estimated learning time for skill $i$ (months)")
-        st.markdown("- $c_i$ = estimated learning cost for skill $i$ (dollars)")
-        st.markdown("- $T$ = user-specified time budget (months)")
-        st.markdown("- $C$ = user-specified cost budget (dollars)")
-    
-    total_missing = sum(len(skills) for skills in missing_skills.values())
-    if total_missing > 0:
-        st.markdown("### Optimization Inputs")
-        
-        # Constraint inputs
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            time_budget = st.number_input(
-                "⏱️ Time Budget, $T$ (months)",
-                min_value=0.1,
-                max_value=24.0,
-                value=3.0,
-                step=0.5,
-                help="Maximum time available for learning (constraint: Σ tᵢ xᵢ ≤ T)"
-            )
-        
-        with col2:
-            cost_budget = st.number_input(
-                "💰 Cost Budget, $C$ ($)",
-                min_value=0.0,
-                max_value=10000.0,
-                value=500.0,
-                step=50.0,
-                help="Maximum budget for courses and learning resources (constraint: Σ cᵢ xᵢ ≤ C)"
-            )
-        
-        # Weight inputs (explicit)
-        st.markdown("### Score Weights (Objective Function Coefficients)")
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            weight_required = st.number_input(
-                "Required Skill Weight, $w_{req}$",
-                min_value=0.1,
-                max_value=10.0,
-                value=1.0,
-                step=0.1,
-                help="Weight for required skills in objective function"
-            )
-        
-        with col2:
-            weight_preferred = st.number_input(
-                "Preferred Skill Weight, $w_{pref}$",
-                min_value=0.1,
-                max_value=10.0,
-                value=0.6,
-                step=0.1,
-                help="Weight for preferred skills in objective function"
-            )
-        
-        with col3:
-            weight_bonus = st.number_input(
-                "Bonus Skill Weight, $w_{bonus}$",
-                min_value=0.1,
-                max_value=10.0,
-                value=0.3,
-                step=0.1,
-                help="Weight for bonus skills in objective function"
-            )
-        
-        # Normalize weights (store in session state for optimization function)
-        total_weight = weight_required + weight_preferred + weight_bonus
-        if total_weight > 0:
-            weight_required_norm = weight_required / total_weight
-            weight_preferred_norm = weight_preferred / total_weight
-            weight_bonus_norm = weight_bonus / total_weight
-        else:
-            weight_required_norm = 1.0
-            weight_preferred_norm = 0.6
-            weight_bonus_norm = 0.3
-        
-        st.info(f"Normalized weights: Required={weight_required_norm:.3f}, Preferred={weight_preferred_norm:.3f}, Bonus={weight_bonus_norm:.3f}")
-        
-        optimize_button = st.button("🔬 Solve Optimization Problem", type="primary", use_container_width=True)
-        
-        if not optimize_button:
-            st.info("💡 Click the button above to solve the optimization problem and obtain the optimal decision.")
-        
-        if optimize_button:
-            with st.spinner("Solving optimization problem..."):
-                try:
-                    # Run optimization with custom weights
-                    selected_skills, skill_details, objective_value, status = optimize_skill_learning(
-                        missing_skills,
-                        time_budget,
-                        cost_budget,
-                        weight_required_norm,
-                        weight_preferred_norm,
-                        weight_bonus_norm
-                    )
-                    
-                    # Calculate expected score improvement
-                    if 'analysis_results' in st.session_state:
-                        results = st.session_state['analysis_results']
-                        score_improvement = calculate_expected_score_improvement(
-                            selected_skills,
-                            results['match_details'],
-                            job_required,
-                            job_preferred,
-                            job_bonus
-                        )
-                    else:
-                        score_improvement = {
-                            'current_score': match_score,
-                            'expected_score': match_score + objective_value / 10,  # Rough estimate
-                            'score_improvement': objective_value / 10
-                        }
-                    
-                    # Display optimization results
-                    st.markdown("### Optimization Results")
-                    
-                    # Solver status - extract and display clearly
-                    is_optimal = "Optimal" in status or "optimal" in status.lower() or "Success" in status
-                    solver_status_text = status.split(":")[-1].strip() if ":" in status else status
-                    
-                    if is_optimal:
-                        st.success("✅ **Solver Status: OPTIMAL**")
-                        st.info("**This solution is optimal under the specified constraints.** The optimization model has found the best possible combination of skills to learn that maximizes your job match score improvement.")
-                    else:
-                        if "Infeasible" in status or "infeasible" in status.lower():
-                            st.error(f"❌ **Solver Status: INFEASIBLE**")
-                            st.warning("No feasible solution exists. Try relaxing your time or cost constraints.")
-                        else:
-                            st.warning(f"⚠️ **Solver Status:** {solver_status_text}")
-                    
-                    st.markdown("---")
-                    
-                    # Summary metrics
-                    total_selected = sum(len(skills) for skills in selected_skills.values())
-                    total_time = sum(details['time_months'] for details in skill_details.values())
-                    total_cost = sum(details['cost_dollars'] for details in skill_details.values())
-                    
-                    col1, col2, col3, col4 = st.columns(4)
-                    
-                    with col1:
-                        st.metric("Objective Value", f"{objective_value:.3f}", 
-                                 help="Maximum weighted score improvement achieved")
-                    with col2:
-                        st.metric("Skills Selected", total_selected)
-                    with col3:
-                        time_pct = (total_time / time_budget * 100) if time_budget > 0 else 0
-                        st.metric("Time Used", f"{total_time:.2f} / {time_budget:.1f} months", 
-                                 f"{time_pct:.1f}%", delta_color="normal")
-                    with col4:
-                        cost_pct = (total_cost / cost_budget * 100) if cost_budget > 0 else 0
-                        st.metric("Cost Used", f"${total_cost:.0f} / ${cost_budget:.0f}", 
-                                 f"{cost_pct:.1f}%", delta_color="normal")
-                    
-                    # Visual confirmation: Bar chart
-                    if total_selected > 0:
-                        st.markdown("---")
-                        st.markdown("### 📊 Budget Utilization Visualization")
-                        chart_data = pd.DataFrame({
-                            'Resource': ['Time Budget', 'Cost Budget'],
-                            'Used (%)': [
-                                (total_time / time_budget * 100) if time_budget > 0 else 0,
-                                (total_cost / cost_budget * 100) if cost_budget > 0 else 0
-                            ]
-                        })
-                        st.bar_chart(chart_data.set_index('Resource'), use_container_width=True)
-                    
-                    st.markdown("---")
-                    
-                    # Optimal Solution Table
-                    st.markdown("### 📋 Optimal Solution")
-                    st.markdown(
-                        """
-                        <div style="background-color: #d4edda; padding: 0.75rem; border-left: 4px solid #28a745; margin-bottom: 1rem;">
-                        <strong>Optimal Decision:</strong> The following skills have been selected by the optimization model 
-                        to maximize your job match score improvement within your constraints.
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-                    
-                    if total_selected > 0:
-                        # Create comprehensive optimal solution table
-                        all_skill_data = []
-                        for priority in ['HIGH', 'MEDIUM', 'LOW']:
-                            for skill in selected_skills.get(priority, []):
-                                details = skill_details[skill]
-                                all_skill_data.append({
-                                    'Priority': priority,
-                                    'Skill': skill,
-                                    'Time (months)': details['time_months'],
-                                    'Cost ($)': details['cost_dollars'],
-                                    'Score Weight': details['score_weight']
-                                })
-                        
-                        if all_skill_data:
-                            df_optimal = pd.DataFrame(all_skill_data)
-                            df_optimal['Priority'] = df_optimal['Priority'].map({
-                                'HIGH': '🔴 Required',
-                                'MEDIUM': '🟠 Preferred', 
-                                'LOW': '⚪ Bonus'
-                            })
-                            df_optimal = df_optimal.sort_values(['Priority', 'Score Weight'], ascending=[True, False])
-                            st.dataframe(df_optimal, use_container_width=True, hide_index=True)
-                            
-                            # Summary statistics
-                            st.markdown("**Summary:**")
-                            col1, col2, col3 = st.columns(3)
-                            with col1:
-                                st.write(f"**Total Skills:** {len(all_skill_data)}")
-                            with col2:
-                                st.write(f"**Total Time:** {total_time:.2f} months")
-                            with col3:
-                                st.write(f"**Total Cost:** ${total_cost:.0f}")
-                            
-                            # Expected score improvement
-                            st.markdown("---")
-                            st.markdown("### Expected Match Score Improvement")
-                            col1, col2, col3 = st.columns(3)
-                            with col1:
-                                st.metric("Current Score", f"{score_improvement['current_score']*100:.1f}%")
-                            with col2:
-                                st.metric("Expected Score", f"{score_improvement['expected_score']*100:.1f}%")
-                            with col3:
-                                st.metric("Improvement", f"+{score_improvement['score_improvement']*100:.1f}%",
-                                         delta=f"{score_improvement['score_improvement']*100:.2f} percentage points")
-                    else:
-                        st.warning(
-                            "⚠️ No skills could be selected within the given constraints. "
-                            "Try increasing your time budget or cost budget."
-                        )
-                    
-                    # Store optimization results
-                    st.session_state['optimization_results'] = {
-                        'selected_skills': selected_skills,
-                        'skill_details': skill_details,
-                        'objective_value': objective_value,
-                        'status': status,
-                        'score_improvement': score_improvement,
-                        'time_budget': time_budget,
-                        'cost_budget': cost_budget
-                    }
-                    
-                except ImportError as e:
-                    st.error(f"❌ Optimization library not available: {str(e)}")
-                    st.info("Please install PuLP or scipy: `pip install pulp` or `pip install scipy`")
-                except Exception as e:
-                    st.error(f"❌ Error during optimization: {str(e)}")
-                    st.exception(e)
-    else:
-        st.info("🎉 No missing skills to optimize! You're already well-matched for this position.")
-    
-    st.markdown("---")
-    
-    # ============================================================================
-    # LEARNING RESOURCES (SECONDARY - OPTIONAL INSIGHTS)
-    # ============================================================================
-    st.markdown("## 📚 Learning Resources & Insights (Optional)")
-    st.markdown(
-        """
-        <div style="background-color: #f8f9fa; padding: 1rem; border-left: 4px solid #6c757d; margin-bottom: 1rem;">
-        <strong>Note:</strong> The optimization model above provides the <strong>optimal decision</strong>. 
-        The resources below are <strong>optional supplementary insights</strong> to help you learn the selected skills.
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # Recommendations
+    st.subheader("📚 Learning Recommendations")
     
     has_recommendations = any(recommendations.get(priority) for priority in ['HIGH', 'MEDIUM', 'LOW'])
     
@@ -669,9 +366,9 @@ def display_results(
         for priority in ['HIGH', 'MEDIUM', 'LOW']:
             if recommendations.get(priority):
                 priority_label = {
-                    'HIGH': '🔴 Required Skills',
-                    'MEDIUM': '🟠 Preferred Skills',
-                    'LOW': '⚪ Bonus Skills'
+                    'HIGH': '🔴 High Priority Skills',
+                    'MEDIUM': '🟠 Medium Priority Skills',
+                    'LOW': '⚪ Low Priority Skills'
                 }.get(priority, priority)
                 
                 with st.expander(priority_label, expanded=(priority == 'HIGH')):
@@ -700,7 +397,187 @@ def display_results(
                         
                         st.markdown("---")
     else:
-        st.info("No learning resources available. Great job on having all the skills!")
+        st.info("No recommendations available. Great job on having all the skills!")
+    
+    st.markdown("---")
+    
+    # Prescriptive Optimization Section
+    st.markdown("## 🎯 Prescriptive Optimization: Optimal Skill Learning Plan")
+    st.markdown(
+        """
+        <div style="background-color: #e3f2fd; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+        <strong>What is Prescriptive Analytics?</strong><br>
+        This optimization engine uses <strong>integer linear programming (PuLP)</strong> to find the <strong>optimal sequence of skills to learn</strong> 
+        that maximizes your job match score improvement within your time and budget constraints. 
+        Unlike recommendations (which suggest what to learn), this provides an <strong>optimized solution</strong> 
+        that answers: "Given X months and $Y budget, which skills should I learn to maximize my match score?"
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    total_missing = sum(len(skills) for skills in missing_skills.values())
+    if total_missing > 0:
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            time_budget = st.number_input(
+                "⏱️ Time Budget (months)",
+                min_value=0.1,
+                max_value=24.0,
+                value=3.0,
+                step=0.5,
+                help="Maximum time available for learning (e.g., 3 months)"
+            )
+        
+        with col2:
+            cost_budget = st.number_input(
+                "💰 Budget ($)",
+                min_value=0.0,
+                max_value=10000.0,
+                value=500.0,
+                step=50.0,
+                help="Maximum budget for courses and learning resources"
+            )
+        
+        optimize_button = st.button("🔬 Optimize Learning Plan", type="primary", use_container_width=True)
+        
+        if not optimize_button:
+            st.info("💡 Click the button above to find the optimal skill learning plan that maximizes your match score within your constraints.")
+        
+        if optimize_button:
+            with st.spinner("Solving optimization problem..."):
+                try:
+                    # Run optimization
+                    selected_skills, skill_details, objective_value, status = optimize_skill_learning(
+                        missing_skills,
+                        time_budget,
+                        cost_budget
+                    )
+                    
+                    # Calculate expected score improvement
+                    if 'analysis_results' in st.session_state:
+                        results = st.session_state['analysis_results']
+                        score_improvement = calculate_expected_score_improvement(
+                            selected_skills,
+                            results['match_details'],
+                            job_required,
+                            job_preferred,
+                            job_bonus
+                        )
+                    else:
+                        score_improvement = {
+                            'current_score': match_score,
+                            'expected_score': match_score + objective_value / 10,  # Rough estimate
+                            'score_improvement': objective_value / 10
+                        }
+                    
+                    # Display optimization results
+                    st.success("✅ Optimization Complete!")
+                    st.info(status)
+                    
+                    st.markdown("---")
+                    
+                    # Summary metrics
+                    col1, col2, col3, col4 = st.columns(4)
+                    
+                    total_selected = sum(len(skills) for skills in selected_skills.values())
+                    total_time = sum(details['time_months'] for details in skill_details.values())
+                    total_cost = sum(details['cost_dollars'] for details in skill_details.values())
+                    
+                    with col1:
+                        st.metric("Skills Selected", total_selected)
+                    with col2:
+                        st.metric("Total Time", f"{total_time:.1f} months")
+                    with col3:
+                        st.metric("Total Cost", f"${total_cost:.0f}")
+                    with col4:
+                        st.metric(
+                            "Score Improvement", 
+                            f"+{score_improvement['score_improvement']*100:.1f}%",
+                            delta=f"{score_improvement['current_score']*100:.1f}% → {score_improvement['expected_score']*100:.1f}%"
+                        )
+                    
+                    st.markdown("---")
+                    
+                    # Optimal skill learning plan
+                    st.subheader("📋 Optimal Learning Plan")
+                    
+                    if total_selected > 0:
+                        # Sort skills by priority and display
+                        for priority in ['HIGH', 'MEDIUM', 'LOW']:
+                            if selected_skills.get(priority):
+                                priority_label = {
+                                    'HIGH': '🔴 High Priority (Required Skills)',
+                                    'MEDIUM': '🟠 Medium Priority (Preferred Skills)',
+                                    'LOW': '⚪ Low Priority (Bonus Skills)'
+                                }.get(priority, priority)
+                                
+                                st.markdown(f"### {priority_label}")
+                                
+                                # Create a table for selected skills
+                                import pandas as pd
+                                skill_data = []
+                                for skill in selected_skills[priority]:
+                                    details = skill_details[skill]
+                                    skill_data.append({
+                                        'Skill': skill,
+                                        'Time (months)': f"{details['time_months']:.2f}",
+                                        'Cost ($)': f"{details['cost_dollars']:.0f}",
+                                        'Score Weight': f"{details['score_weight']:.2f}"
+                                    })
+                                
+                                if skill_data:
+                                    df = pd.DataFrame(skill_data)
+                                    st.dataframe(df, use_container_width=True, hide_index=True)
+                                
+                                st.markdown("<br>", unsafe_allow_html=True)
+                        
+                        # Learning sequence recommendation
+                        st.markdown("### 📅 Recommended Learning Sequence")
+                        st.info(
+                            "Learn skills in priority order (HIGH → MEDIUM → LOW) for maximum impact. " 
+                            "You can learn multiple skills in parallel if time permits."
+                        )
+                        
+                        # Show unused budget
+                        unused_time = time_budget - total_time
+                        unused_cost = cost_budget - total_cost
+                        
+                        if unused_time > 0.1 or unused_cost > 10:
+                            st.markdown("### 💡 Budget Utilization")
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                time_pct = (total_time / time_budget * 100) if time_budget > 0 else 0
+                                st.metric("Time Used", f"{time_pct:.1f}%", f"{unused_time:.1f} months remaining")
+                            with col2:
+                                cost_pct = (total_cost / cost_budget * 100) if cost_budget > 0 else 0
+                                st.metric("Budget Used", f"{cost_pct:.1f}%", f"${unused_cost:.0f} remaining")
+                    else:
+                        st.warning(
+                            "⚠️ No skills could be selected within the given constraints. " 
+                            "Try increasing your time budget or cost budget."
+                        )
+                    
+                    # Store optimization results
+                    st.session_state['optimization_results'] = {
+                        'selected_skills': selected_skills,
+                        'skill_details': skill_details,
+                        'objective_value': objective_value,
+                        'status': status,
+                        'score_improvement': score_improvement,
+                        'time_budget': time_budget,
+                        'cost_budget': cost_budget
+                    }
+                    
+                except ImportError as e:
+                    st.error(f"❌ Optimization library not available: {str(e)}")
+                    st.info("Please install PuLP or scipy: `pip install pulp` or `pip install scipy`")
+                except Exception as e:
+                    st.error(f"❌ Error during optimization: {str(e)}")
+                    st.exception(e)
+    else:
+        st.info("🎉 No missing skills to optimize! You're already well-matched for this position.")
     
     st.markdown("---")
     
@@ -734,4 +611,3 @@ def display_results(
 
 if __name__ == "__main__":
     main()
-

@@ -4,13 +4,12 @@ A comprehensive Streamlit application that analyzes resumes against job descript
 
 ## 🎥 Live Demo & Video
 
-**🌐 Live Application:** [(https://Resume Skills Gap Analyzer.streamlit.app)](https://resume-skills-gap-analyzer-9qsk9dy3kqde6pr3ksrv4s.streamlit.app/)
+**🌐 Live Application:** [Resume Skills Gap Analyzer](https://resume-skills-gap-analyzer-9qsk9dy3kqde6pr3ksrv4s.streamlit.app/)
 
 **📹 Video Demonstration:** [Your Video Link Here](https://youtube.com/watch?v=your-video-id)
 
 ## 🎯 Features
 
-### Diagnostic Analytics
 - **Multi-format Resume Support**: Upload resumes in PDF, DOCX, or TXT format
 - **Intelligent Skill Extraction**: Automatically extracts technical skills from resumes and job descriptions using a comprehensive skill dictionary (200+ skills)
 - **Semantic Matching**: Uses SBERT embeddings for intelligent skill matching beyond simple keyword matching
@@ -25,6 +24,7 @@ A comprehensive Streamlit application that analyzes resumes against job descript
   - Estimated learning timelines
 
 ### Prescriptive Analytics (Optimization)
+
 - **🎯 Optimal Skill Learning Plan**: Uses **Integer Linear Programming (PuLP)** to find the optimal sequence of skills to learn
 - **Constraint-Based Optimization**: Maximizes job match score improvement under:
   - ⏱️ **Time constraints** (e.g., "I have 3 months")
@@ -33,6 +33,7 @@ A comprehensive Streamlit application that analyzes resumes against job descript
 - **Prescriptive Solution**: Answers "Given X months and $Y budget, which skills should I learn to maximize my match score?"
 
 ### Additional Features
+
 - **PDF Export**: Generate comprehensive PDF reports with all analysis results
 - **Job Template Library**: Pre-configured templates for common roles (Software Engineer, Data Scientist, DevOps, etc.)
 
@@ -239,23 +240,23 @@ For issues, questions, or suggestions, please open an issue on the GitHub reposi
 
 This application implements **prescriptive analytics** using optimization techniques:
 
-- **Optimization Library**: [PuLP](https://github.com/coin-or/pulp) (Integer Linear Programming)
-- **Fallback Solver**: [scipy.optimize](https://docs.scipy.org/doc/scipy/reference/optimize.html) (continuous relaxation)
+- **Optimization Library**: PuLP (Integer Linear Programming)
+- **Fallback Solver**: scipy.optimize (continuous relaxation)
 - **Problem Type**: 0-1 Knapsack variant with multiple constraints
 - **Objective Function**: Maximize weighted job match score improvement
-- **Constraints**: 
+- **Constraints**:
   - Time budget (months)
   - Cost budget (dollars)
 - **Decision Variables**: Binary (learn skill or not)
 
-The optimization engine answers the prescriptive question: *"Given my constraints, what is the optimal set of skills to learn?"*
+The optimization engine answers the prescriptive question: _"Given my constraints, what is the optimal set of skills to learn?"_
 
 ## 🎉 Acknowledgments
 
 - Built with [Streamlit](https://streamlit.io)
 - Uses [sentence-transformers](https://www.sbert.net/) for semantic similarity
 - PDF generation powered by [ReportLab](https://www.reportlab.com/)
-- Optimization powered by [PuLP](https://github.com/coin-or/pulp) and [scipy](https://scipy.org/)
+- Optimization powered by PuLP and scipy
 
 ---
 
